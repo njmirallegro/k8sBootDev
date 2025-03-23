@@ -1,25 +1,83 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synergychat-api
+  annotations:
+    deployment.kubernetes.io/revision: "8"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"synergychat-api"},"name":"synergychat-api","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"synergychat-api"}},"template":{"metadata":{"labels":{"app":"synergychat-api"}},"spec":{"containers":[{"env":[{"name":"API_PORT","valueFrom":{"configMapKeyRef":{"key":"API_PORT","name":"synergychat-api-configmap"}}}],"image":"bootdotdev/synergychat-api:latest","name":"synergychat-api","resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}}]}}}}
+  creationTimestamp: "2025-03-16T23:27:21Z"
+  generation: 9
   labels:
     app: synergychat-api
+  name: synergychat-api
+  namespace: default
+  resourceVersion: "33155"
+  uid: 3ed1dc83-8135-42af-90b8-c0b4cdf58343
 spec:
+  progressDeadlineSeconds: 600
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: synergychat-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2025-03-23T16:14:49-04:00"
+      creationTimestamp: null
       labels:
         app: synergychat-api
     spec:
       containers:
-        - name: synergychat-api
-          image: bootdotdev/synergychat-api:latest
-          env:
+        - env:
             - name: API_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: synergychat-api-configmap
                   key: API_PORT
+                  name: synergychat-api-configmap
+            - name: API_DB_FILEPATH
+              valueFrom:
+                configMapKeyRef:
+                  name: synergychat-api-configmap
+                  key: API_DB_FILEPATH
+          image: bootdotdev/synergychat-api:latest
+          imagePullPolicy: Always
+          name: synergychat-api
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: "2025-03-16T23:49:23Z"
+      lastUpdateTime: "2025-03-23T20:14:51Z"
+      message: ReplicaSet "synergychat-api-c84f86c4c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2025-03-23T20:16:43Z"
+      lastUpdateTime: "2025-03-23T20:16:43Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+  observedGeneration: 9
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
